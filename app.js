@@ -74,12 +74,12 @@ wss.on('connection', (ws, req) => {
   // These errors most commonly occur when FFmpeg closes and there is still
   // data to write.f If left unhandled, the server will crash.
   ffmpeg.stdin.on('error', (e) => {
-    console.log('FFmpeg STDIN Error', e);
+    console.log('Error:', e);
   });
 
   // FFmpeg outputs all of its messages to STDERR. Let's log them to the console.
   ffmpeg.stderr.on('data', (data) => {
-    console.log('FFmpeg STDERR:', data.toString());
+    console.log(data.toString());
     if(data.toString().toLowerCase().includes('error')) {
       ws.send('error')
     }
@@ -87,7 +87,6 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (msg) => {
     if (Buffer.isBuffer(msg)) {
-      console.log('this is some video data');
       ffmpeg.stdin.write(msg);
     } else {
       console.log(msg);
@@ -95,7 +94,7 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', (e) => {
-    console.log('shit got closed, yo');
+    console.log('closed');
     ffmpeg.kill('SIGINT');
   });
 });
